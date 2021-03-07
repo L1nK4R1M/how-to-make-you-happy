@@ -1,3 +1,4 @@
-# node-mysql-registration-login-api
+# Back-end Web App
 
-Node.js + MySQL API for User Management, Authentication and Registration
+Node.js + MySQL API to manage database
+
