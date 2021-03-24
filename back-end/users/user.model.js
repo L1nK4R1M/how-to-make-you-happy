@@ -7,6 +7,7 @@ function model(sequelize) {
         firstName: { type: DataTypes.STRING, allowNull: false },
         username: { type: DataTypes.STRING, allowNull: false },
         email: { type: DataTypes.STRING, allowNull: false },
+        birthdate: { type: DataTypes.DATE, allowNull: false },
         hash: { type: DataTypes.STRING, allowNull: false }
     };
 

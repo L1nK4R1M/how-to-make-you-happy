@@ -1,6 +1,77 @@
-﻿<div class="p-4">
-    <div class="container">
-        <h1>Good Luck {{user.firstName}}!</h1>
-        <p>Play and Win !!!</p>
-    </div>
+﻿<div class="play-component">
+
+    <p *ngIf="currentUser && (prizes.length > 0)" style="margin-top: 77px;">Good luck!</p>
+    
+    <div class="play-button">
+        <button (click)="play()" *ngIf="currentUser && (prizes.length > 0) && !isPlaying" class="btn btn-sm btn-danger btn-add-prize mx-auto">
+          <span>PLAY!</span>
+        </button>
+      </div>
+     <div *ngIf="(prizes.length > 0)" style="flex-grow: 1;"><h1 id="output"></h1></div>
+
+    <div class="list-prize">
+      <div class="loading-container" *ngIf="isLoading">
+        <span class="spinner-border"></span>
+      </div>
+        <table class="table table-hover" *ngIf="(prizes.length > 0); else waitPrizeTimeleft">
+            <thead>
+            <tr>
+                <th style="width: 20%" (click)="sortFunction(sortAsc, 'name')" >Name <i class="fa fa-sort"></i></th>
+                <th style="width: 10%" (click)="sortFunction(sortAsc, 'cost')">Cost <i class="fa fa-sort"></i></th>
+                <th style="width: 30%;" (click)="sortByTimer(sortAsc)">Timer <i class="fa fa-sort"></i></th> 
+                <th style="min-width: 20%" *ngIf="currentUser.username == 'admin'"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let prize of prizes">
+                <td>{{prize.name}}</td>
+                <td>{{prize.cost | number}}</td>
+                <td>
+                <div class="timer-cell">{{prize.timer | async }}</div>
+                </td>
+            </tr>
+            <tr *ngIf="(prizes.length == 0)">
+                <td colspan="4" class="text-center">
+                <span class="spinner-border spinner-border-lg align-center"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <div class="modal fade" id="modalLoose" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle" style="font-family: ABChanel Corpo SemiBold;">Result</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" >
+                    <div id="resultPrize">
+                      <h1>Too Bad! 😞😞😞 You have a:</h1>
+                      <h1>{{resultRandom}}</h1>
+                      <h1>Maybe next time!</h1></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" style="font-family: ABChanel Corpo SemiBold;">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+        <div class="congrats-fireworks" *ngIf="displayWon">
+          <div class="congrats-message" id="hbMessage-container" (click)="stopAnimation()">
+              <h1>Congratulations! 🎉🎉🎉</h1>
+              <h1>You won: {{resultRandom}}</h1>
+          </div>
+        </div>
+
+        <ng-template #waitPrizeTimeleft>
+          <div class="no-prizes-message" *ngIf="currentUser && !isLoading">
+          <h1 >There is no prize to play for now. You can check when the next prizes will be available in Prizes page.</h1>
+          </div>
+        </ng-template>        
 </div>

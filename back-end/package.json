@@ -1,7 +1,7 @@
 {
-    "name": "node-mysql-registration-login-api",
+    "name": "node-mysql-registration-api",
     "version": "1.0.0",
-    "description": "Node.js + MySQL API for User Management, Authentication and Registration",
+    "description": "Node.js + MySQL API for User Authentication and Prize Management and Registration",
     "scripts": {
         "start": "node ./server.js",
         "start:dev": "nodemon ./server.js"
@@ -14,6 +14,7 @@
         "express-jwt": "^6.0.0",
         "joi": "^17.2.0",
         "jsonwebtoken": "^8.5.1",
+        "multer": "^1.4.2",
         "mysql2": "^2.1.0",
         "rootpath": "^0.1.2",
         "sequelize": "^6.3.4"

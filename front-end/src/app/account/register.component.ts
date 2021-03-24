@@ -5,7 +5,8 @@ import { first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from '@app/_services';
 
-@Component({ templateUrl: 'register.component.html' })
+@Component({ templateUrl: 'register.component.html',
+styleUrls: ['log-reg.component.scss'] })
 export class RegisterComponent implements OnInit {
     form: FormGroup;
     loading = false;
@@ -23,6 +24,7 @@ export class RegisterComponent implements OnInit {
         this.form = this.formBuilder.group({
             firstName: ['', Validators.required],
             username: ['', Validators.required],
+            birthdate: ['', Validators.required],
             email: ['', [Validators.required, 
                 Validators.pattern(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
             password: ['', [Validators.required, Validators.minLength(6)]]
