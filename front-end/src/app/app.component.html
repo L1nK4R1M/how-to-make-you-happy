@@ -1,0 +1,33 @@
+﻿<nav class="navbar smart-scroll navbar-default">
+    <a class="navbar-brand navbar-toggle" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+      <h2>HTMYH</h2>
+    </a>
+    <div class="navbar-collapse collapse" id="nav">
+      <ul class="navbar-nav navbar-center">
+        <li><a class="nav-item nav-link" data-toggle="collapse" data-target=".navbar-collapse.show" routerLink="/home" routerLinkActive="active">Home</a></li>
+        <li><a class="nav-item nav-link" data-toggle="collapse" data-target=".navbar-collapse.show" routerLink="/prizes" routerLinkActive="active">Prizes</a></li>
+        <li><a class="nav-item nav-link" data-toggle="collapse" data-target=".navbar-collapse.show" routerLink="/play" routerLinkActive="active">Play</a></li>
+        <ng-container *ngIf="currentUser;  then loggedOut; else loggedIn"></ng-container>
+      </ul>
+    </div>
+</nav>
+
+<ng-template #loggedIn>
+  <li><a class="nav-item nav-link" data-toggle="collapse" data-target=".navbar-collapse.show" routerLink="/account/login" routerLinkActive="active">Login</a></li>
+</ng-template>
+<ng-template #loggedOut>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+      aria-expanded="false">{{currentUser.firstName}}</a>
+    <div class="dropdown-menu" style="position: absolute;">
+      <!-- <a class="dropdown-item"  routerLink="../edit">Edit</a> -->
+      <a class="dropdown-item" (click)="logout()">Logout</a>
+    </div>
+  </li>
+</ng-template>
+
+<!-- main app container -->
+<div class="page-container">
+  <alert></alert>
+  <router-outlet></router-outlet>
+</div>

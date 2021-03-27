@@ -1,0 +1,109 @@
+:host {
+  min-height: 100vh;
+}
+
+/*************************************************************
+  NAVBAR
+**************************************************************/
+
+.btn-delete-user {
+  width: 40px;
+  text-align: center;
+  box-sizing: content-box;
+}
+
+.page-container {
+  height: 100vh;
+}
+
+.smart-scroll {
+  // fixed the navbar to top
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  background-color: white;
+  width: 100%;
+  transition: ease 0.4s;
+  &--scrolled {
+    height: 40px;
+  }  
+}
+
+.scrolled-down{
+  transform:translateY(-100%); transition: all 0.3s ease-in-out;
+}
+.scrolled-up{
+  transform:translateY(0); transition: all 0.3s ease-in-out;
+}
+
+.navbar-brand {
+  font-family: ABChanel Corpo SemiBold, sans-serif;
+  color: black;
+  margin: auto;
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+
+.nav-item {
+  font-family: ABChanel Corpo Regular, sans-serif;
+  color: black;
+  margin-right: 40px;
+}
+
+.navbar.navbar-default {
+  background: white;
+}
+
+.dropdown-menu a:hover {
+  background-color: transparent;
+}
+
+.dropdown-item {
+  display: initial;
+}
+
+/* Mobile devices ----------- */
+@media (max-width: 767px) {
+  .container-fluid {
+    justify-content: left;
+  }
+
+  .navbar-header-center {
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .nav-item {
+    padding-left: 20px;
+  }
+}
+
+/* Desktops and laptops ----------- */
+@media (min-width: 800px) {
+  .nav-link {
+    padding: 5px;
+  }
+  
+  .navbar-nav.navbar-center {
+    justify-content: space-evenly;
+    flex-direction: row;
+  }
+}
+
+
+/* .background-1 {
+  background-image: url("../assets/images/jewelry8.webp");
+}
+
+.background-2 {
+  background-image: url("../assets/images/bags5.jpg");
+}
+
+
+.background-3 {
+  background-image: url("../assets/images/travel.jpg");
+}
+
+.background-4 {
+  background-image: url("../assets/images/cosmetic6.jpg");
+} */

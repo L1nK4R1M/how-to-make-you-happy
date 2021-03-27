@@ -1,0 +1,209 @@
+﻿<div class="prizes-component">
+  <p *ngIf="currentUser" style="margin-top: 77px;">LIST OF PRIZES</p>
+  <div class="list-prize">
+    <div>
+      <button (click)="needToAdd = !needToAdd" *ngIf="currentUser" style="margin-bottom: 20px; height: 40px; display: block;"
+        class="btn btn-sm btn-danger btn-add-prize mx-auto">
+        <span>Add new prize</span>
+      </button>
+    </div>
+    <table class="table table-hover" *ngIf="(prizes.length > 0)">
+      <thead>
+        <tr>
+          <td colspan="4" class="text-center">
+            <span class="align-center">You can still win : </span>
+          </td>
+        </tr>
+        <tr>
+          <th style="min-width: 20%">Picture</th>
+          <th style="width: 20%" (click)="sortFunction(sortAsc, 'name')">Name <i class="fa fa-sort"></i></th>
+          <th style="width: 10%" (click)="sortFunction(sortAsc, 'cost')">Cost <i class="fa fa-sort"></i></th>
+          <th style="width: 30%;" (click)="sortByTimer(sortAsc)">Timer <i class="fa fa-sort"></i></th>
+          <th style="min-width: 20%" *ngIf="currentUser.username == 'admin'"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prize of prizes">
+          <td><img src="{{prize.picture}}" class="img-fluid img-thumbnail"></td>
+          <td>{{prize.name}}</td>
+          <td>{{prize.cost}}</td>
+          <td>
+            <div class="timer-cell">{{prize.timer | async }}</div>
+          </td>
+          <td style="white-space: nowrap" *ngIf="currentUser.username == 'admin'">
+            <a class="btn btn-sm btn-primary mr-1" (click)="editPrize(prize)">Edit</a>
+            <button (click)="deletePrize(prize.name, prize.user)" class="btn btn-sm btn-danger btn-delete-user">
+              <span *ngIf="prize.isDeleting" class="spinner-border spinner-border-sm"></span>
+              <span *ngIf="!prize.isDeleting">Delete</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="(prizes.length == 0)">
+          <td colspan="4" class="text-center">
+            <span class="spinner-border spinner-border-lg align-center"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table table-hover" *ngIf="(prizesWon.length > 0)">
+      <thead>
+        <tr>
+          <td colspan="4" class="text-center">
+            <span class="align-center">You have won : </span>
+          </td>
+        </tr>
+        <tr>
+          <th style="min-width: 20%">Picture</th>
+          <th style="width: 20%" (click)="sortFunctionWon(sortAsc, 'name')">Name <i class="fa fa-sort"></i></th>
+          <th style="width: 10%" (click)="sortFunctionWon(sortAsc, 'cost')">Cost <i class="fa fa-sort"></i></th>
+          <th style="width: 30%">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prize of prizesWon">
+          <td><img src="{{prize.picture}}" class="img-fluid img-thumbnail"></td>
+          <td>{{prize.name}}</td>
+          <td>{{prize.cost}}</td>
+          <td>{{prize.won_date | date:'d/MM/yyyy HH:mm:ss'}}</td>
+        </tr>
+        <tr *ngIf="(prizesWon.length == 0)">
+          <td colspan="4" class="text-center">
+            <span class="spinner-border spinner-border-lg align-center"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="add-prize" *ngIf="needToAdd">
+    <div class="card">
+      <h4 class="card-header">Add a prize</h4>
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" formControlName="name" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f.name.errors }" />
+            <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
+              <div *ngIf="f.name.errors.required">Name is required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="cost">Cost</label>
+            <input type="text" formControlName="cost" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f.cost.errors }" />
+            <div *ngIf="submitted && f.cost.errors" class="invalid-feedback">
+              <div *ngIf="f.cost.errors.required">Cost is required</div>
+              <div *ngIf="f.cost.errors.pattern">Number is only required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group px-2 py-2 rounded-pill bg-white shadow-sm">
+              <input id="upload" type="file" formControlName="picture" accept="image/*" (change)="updateName($event)"
+                class="form-control border-0" style="z-index: 10; position: absolute; width: 100%;">
+              <div class="input-group-append">
+                <label for="picture" class="btn btn-light m-0 rounded-pill px-4">
+                  <i class="fas fa-upload mr-2 text-muted"></i>
+                  <small class="text-uppercase font-weight-bold text-muted">Upload</small>
+                </label>
+              </div>
+              <label id="upload-label" for="picture"
+                class="font-weight-light text-muted text-right">{{pictureName}}</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <button [disabled]="loading" class="btn btn-primary" style="margin-right: 20px">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span><span>Add</span>
+            </button>
+            <button (click)="needToAdd = !needToAdd" class="btn btn-secondary">
+              <span class="mr-1">Cancel</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="edit-prize" *ngIf="needToEdit">
+    <div class="card">
+      <h4 class="card-header">Edit a prize</h4>
+      <div class="card-body">
+        <form [formGroup]="formEdit" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" formControlName="name" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f2.name.errors }" />
+            <div *ngIf="submitted && f2.name.errors" class="invalid-feedback">
+              <div *ngIf="f2.name.errors.required">Name is required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="cost">Cost</label>
+            <input type="text" formControlName="cost" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f2.cost.errors }" />
+            <div *ngIf="submitted && f2.cost.errors" class="invalid-feedback">
+              <div *ngIf="f2.cost.errors.required">Cost is required</div>
+              <div *ngIf="f2.cost.errors.pattern">Number is only required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" formControlName="category" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f2.category.errors }" />
+            <div *ngIf="submitted && f2.category.errors" class="invalid-feedback">
+              <div *ngIf="f2.category.errors.required">Category is required</div>
+              <div *ngIf="f2.category.errors.pattern">Number is only required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="countdown_time">Countdown</label>
+            <input type="text" formControlName="countdown_time" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f2.countdown_time.errors }" />
+            <div *ngIf="submitted && f2.countdown_time.errors" class="invalid-feedback">
+              <div *ngIf="f2.countdown_time.errors.required">Countdown is required</div>
+              <div *ngIf="f2.countdown_time.errors.pattern">Number is only required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="already_won">Already won</label>
+            <input type="checkbox" formControlName="already_won" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f2.already_won.errors }" style="display: inline-block; position: absolute; left: 0px;"/>
+            <div *ngIf="submitted && f2.already_won.errors" class="invalid-feedback">
+              <div *ngIf="f2.already_won.errors.required">Already won is required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="user">User</label>
+            <input type="text" formControlName="user" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f2.user.errors }" />
+            <div *ngIf="submitted && f2.user.errors" class="invalid-feedback">
+              <div *ngIf="f2.user.errors.required">User is required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group px-2 py-2 rounded-pill bg-white shadow-sm">
+              <input id="upload" type="file" formControlName="picture" accept="image/*" (change)="updateName($event)"
+                class="form-control border-0" style="z-index: 10; position: absolute; width: 100%;">
+              <div class="input-group-append">
+                <label for="picture" class="btn btn-light m-0 rounded-pill px-4">
+                  <i class="fas fa-upload mr-2 text-muted"></i>
+                  <small class="text-uppercase font-weight-bold text-muted">Upload</small>
+                </label>
+              </div>
+              <label id="upload-label" for="picture"
+                class="font-weight-light text-muted text-right">{{pictureName}}</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <button [disabled]="loading" class="btn btn-primary" style="margin-right: 20px">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span><span>Edit</span>
+            </button>
+            <button (click)="needToEdit = !needToEdit" class="btn btn-secondary">
+              <span class="mr-1">Cancel</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

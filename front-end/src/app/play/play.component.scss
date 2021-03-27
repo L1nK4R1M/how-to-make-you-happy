@@ -1,0 +1,188 @@
+:host {
+  min-height: 100vh;
+  display: block;
+}
+
+p {
+  font-family: ABChanel Corpo SemiBold;
+  color: white;
+  text-align: center;
+
+  flex-grow: 1;
+}
+
+td,
+th {
+  vertical-align: middle;
+  text-align: center;
+  color: white
+}
+
+th,
+span,
+h4 {
+  font-family: ABChanel Corpo SemiBold;
+}
+
+td,
+label,
+i {
+  font-family: ABChanel Corpo Extra Light;
+}
+
+
+h1 {
+  font-family: ABChanel Corpo SemiBold;
+  color: white;
+  text-align: center;
+}
+
+.table {
+  box-shadow: inset 0 0 0 10000px rgba(0, 0, 0, 0.3);
+}
+
+.congrats-fireworks {
+  height: 100%;
+  width: 100%;
+  background-color: #000000e6;
+  position: fixed;
+
+  opacity: 0;
+  transition-duration: .3s;
+  transition-property: opacity;
+}
+
+.congrats-fireworks.active {
+  opacity: 1;
+}
+
+.congrats-message {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  color: white;
+  font-family: ABChanel Corpo SemiBold;
+
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.loading-container {
+  height: 100%;
+  background-color: transparent;
+  text-align: center;
+}
+
+#resultPrize h1{
+  font-family: ABChanel Corpo Extra Light;
+  color: black;
+  font-size: 1.5rem;
+}
+
+.no-prizes-message {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 2;
+
+  text-shadow:
+   -1px -1px 0 #000,  
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+     1px 1px 0 #000;
+}
+
+.play-button {
+
+  span {
+    font-size: 40px;
+  }
+}
+
+.play-component {
+  background-image: url("../../assets/images/cosmetic10.jpg");
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-shadow: inset 0 0 0 10000px rgba(0, 0, 0, 0.3);
+
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.list-prize {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 2;
+}
+
+.timer-cell {
+  font-family: ABChanel Corpo SemiBold;
+  /*text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;*/
+  color: gold;
+  min-height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#wheelOfFortune {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+#wheel {
+  display: block;
+}
+
+#spin {
+  font: 1.5em/0 sans-serif;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  height: 30%;
+  margin: -15%;
+  background: #fff;
+  color: #fff;
+  box-shadow: 0 0 0 8px currentColor, 0 0px 15px 5px rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  transition: 0.8s;
+}
+
+#spin::after {
+  content: "";
+  position: absolute;
+  top: -17px;
+  border: 10px solid transparent;
+  border-bottom-color: currentColor;
+  border-top: none;
+}
+
+
+/* Mobile devices ----------- */
+@media (max-width: 767px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+}
+
+/* Desktops and laptops ----------- */
+@media (min-width: 800px) {
+  .list-prize {
+    width: 50%;
+  }
+}

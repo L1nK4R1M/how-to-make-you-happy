@@ -1,0 +1,36 @@
+:host {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+
+.log-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+label {
+    font-family: ABChanel Corpo Extra Light;
+}
+
+h4, button, a {
+    font-family: ABChanel Corpo Regular;
+}
+
+/* Mobile devices ----------- */
+@media (max-width: 767px) {
+    .log-reg-component {
+        width: 75%
+    }
+
+}
+  
+/* Desktops and laptops ----------- */
+@media (min-width: 800px) {
+    .log-reg-component {
+       width: 25%;
+    }
+}
