@@ -1,4 +1,4 @@
-﻿import { Component} from '@angular/core';
+﻿import { Component, ElementRef, ViewChild} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GlobalConstants } from '@app/common/global-constants';
@@ -6,7 +6,7 @@ import { Utils } from '@app/common/utils';
 
 import { Prize, User } from '@app/_models';
 import { AccountService, AlertService, PrizeService } from '@app/_services';
-import { timer } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 @Component({ 
@@ -25,6 +25,7 @@ export class PrizesComponent {
     sortAsc: boolean = false;
     prizeToEdit: Prize;
     pictureName = "";
+    pathToPicture = GlobalConstants.pathToPrize; 
     pictureFile: any;
     prizes: Prize[] = [];
     prizesWon: Prize[] = [];
@@ -50,19 +51,24 @@ export class PrizesComponent {
                 cost: ['', [Validators.required, Validators.pattern("^[0-9]*")]],
                 category: ['', [Validators.required, Validators.pattern("^[0-9]*")]],
                 countdown_time: ['', Validators.required],
-                already_won: ['', Validators.required],
+                already_won: [''],
                 user: ['', Validators.required],
                 picture: ['']
             });
-        
-            this.prizeService.getByUser(this.currentUser.username)
+
+            let listOfPrizes: Observable<Prize[]>;
+            if (this.currentUser.username == 'admin') {
+                listOfPrizes = this.prizeService.getAll();
+            } else {
+                listOfPrizes = this.prizeService.getByUser(this.currentUser.username)
+            }
+            listOfPrizes
                 .pipe(first())
                 .subscribe(prizes => {
                     this.prizes = prizes.filter(p => p.already_won == false);
                     this.prizesWon = prizes.filter(p => p.already_won)
                     this.sortByTimer(false);
                     this.prizes.map((prize: Prize) => this.initializePrize(prize))
-                    this.prizesWon.map((prize: Prize) => prize.picture = (prize.picture ? GlobalConstants.pathToPrize+prize.picture : ""));
                 });
         }
     }
@@ -71,7 +77,6 @@ export class PrizesComponent {
     }
 
     initializePrize(prize: Prize) {
-        prize.picture = (prize.picture ? GlobalConstants.pathToPrize+prize.picture : "");
         prize.timer =  timer(0,1000).pipe(map(() => this.getCountdownPrize(prize)))
     }
 
@@ -117,8 +122,7 @@ export class PrizesComponent {
     }
 
     updatePrize() {
-        var newUpdatedPrize = Object.assign(this.prizeToEdit, this.formEdit.value)
-        this.prizeService.update(newUpdatedPrize.name, newUpdatedPrize.user, this.formEdit.value)
+        this.prizeService.update(this.prizeToEdit.name, this.prizeToEdit.user, this.formEdit.value)
             .pipe(first())
             .subscribe({
                 next: () => {
@@ -151,6 +155,7 @@ export class PrizesComponent {
                 next: () => {
                     this.prizes = this.prizes.filter(x => (x.name !== name && x.user !== user))
                     this.alertService.success(name + ' deleted successfully', { keepAfterRouteChange: true });
+                    window.location.reload();
                     this.loading = false;
                 },
                 error: error => {
@@ -186,35 +191,18 @@ export class PrizesComponent {
         this.pictureName = imageInput.target.files[0].name;
       }
 
-    resetCountdownPrize(prize: Prize) {
-            var newCountDown = new Date().getTime() + prize.countdown_time;
-            prize.time_end = new Date(newCountDown)
-            this.prizeService.update(prize.name, prize.user, prize)
-            .pipe(first())
-            .subscribe({
-                next: () => {
-                    this.alertService.success('Timer of ' + prize.name + ' has been reset.', { keepAfterRouteChange: true });
-                },
-                error: error => {
-                    this.alertService.error(error);
-                }
-            });
-    }
-
     getCountdownPrize(prize: Prize) {
         var today = Date.now();
 
         var interval;
 
-        var newDate_end_24h = new Date(new Date(prize.time_end_24h).setUTCHours(new Date(prize.time_end_24h).getUTCHours() - 1) ).getTime()
-        var newDate_end = new Date(new Date(prize.time_end).setUTCHours(new Date(prize.time_end).getUTCHours() - 1) ).getTime()
+        var newDate_end = new Date(prize.time_end).getTime()
 
-        if  (newDate_end <= today && newDate_end_24h >= today) {
-            interval = newDate_end_24h - today;
-            if(interval < 0) this.resetCountdownPrize(prize);
-            return Utils.getTimer(interval);
+        interval = newDate_end - today;
+        if (interval <= 0) {
+            prize.color = 'lime'
+            return "Available";
         } else {
-            interval = newDate_end - today;
             return Utils.getTimer(interval);
         }
     }
@@ -224,7 +212,7 @@ export class PrizesComponent {
             this.prizes.sort((a, b) => a[variable] < b[variable] ? 1 : a[variable]  > b[variable]  ? -1 : 0)
             this.sortAsc = !this.sortAsc
         }
-        else{
+        else {
             this.prizes.sort((a, b) => a[variable]  > b[variable]  ? 1 : a[variable]  < b[variable]  ? -1 : 0)
             this.sortAsc = !this.sortAsc
         }
@@ -258,16 +246,12 @@ export class PrizesComponent {
         var newPrize = prize;
         newPrize.category = Utils.addCategory(newPrize.cost);
 
-        if (this.prizes.length == 0 && this.prizesWon.length == 0) {
-            newPrize.countdown_time = 0;
-        } else {
-            newPrize.countdown_time = Utils.addCountDown(newPrize.category)
-        }
+        newPrize.countdown_time = Utils.addCountDown(newPrize.category)
         
         newPrize.picture = this.pictureName
 
         var today = Date.now();
-        newPrize.time_end = new Date(today + newPrize.countdown_time);
+        newPrize.time_end = new Date(today + ((24 * 60 * 60 * 1000) * this.prizes.length));
 
         newPrize.user = this.accountService.userValue.username;
 

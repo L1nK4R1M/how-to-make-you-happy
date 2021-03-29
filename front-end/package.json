@@ -27,6 +27,7 @@
     "font-awesome": "^4.7.0",
     "gsap": "^3.6.0",
     "locomotive-scroll": "^4.1.0",
+    "ngx-material-file-input": "^2.1.1",
     "rxjs": "^6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "^0.10.3"

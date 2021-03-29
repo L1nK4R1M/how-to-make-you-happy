@@ -12,4 +12,5 @@ export class Prize {
     picture: string;
     timer: any;
     isDeleting: boolean;
+    color: string;
 }

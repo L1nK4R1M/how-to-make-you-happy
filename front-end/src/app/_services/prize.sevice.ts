@@ -40,9 +40,7 @@ export class PrizeService {
         .pipe(
             map(prizes => 
             prizes.filter(prize =>
-                new Date(new Date(prize.time_end).setUTCHours(new Date(prize.time_end).getUTCHours() - 1) ).getTime() <= today 
-                && new Date(new Date(prize.time_end_24h).setUTCHours(new Date(prize.time_end_24h).getUTCHours() - 1) ).getTime() >= today
-                && prize.already_won == false
+                new Date(prize.time_end).getTime() <= today && prize.already_won == false
             )));
     }
 

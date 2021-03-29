@@ -8,9 +8,11 @@ import { AccountService } from '@app/_services';
 import LocomotiveScroll from 'locomotive-scroll';
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { Fireworks } from 'fireworks-js'
 
 import { timer } from 'rxjs';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'home-page',
@@ -33,7 +35,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('background4') bg4: ElementRef;
   @ViewChild('smoothscroll') smoothScroll: ElementRef;
 
-  constructor(private accountService: AccountService, private router: Router, private route: ActivatedRoute, private renderer: Renderer2) {
+  constructor(private accountService: AccountService, private router: Router, private route: ActivatedRoute, private renderer: Renderer2, private viewportScroller: ViewportScroller) {
 
   }
 
@@ -41,17 +43,24 @@ export class HomeComponent implements OnInit, OnDestroy {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  onClickScroll(elementId: string): void { 
+    console.log(elementId);
+    gsap.to(window, { duration: 1, scrollTo: elementId , ease: "power4.inOut" });
+}
+
   ngOnInit() {
     this.currentUser = this.accountService.userValue;
     if (this.currentUser) {
       var today = new Date(Date.now());
       var bd = new Date(this.currentUser.birthdate);
-      this.isBirthday = today.getMonth() == bd.getMonth() && today.getDate() == bd.getDate();
-      //this.isBirthday = today.getMonth() == 2 && today.getDate() == 20;
-      var user: User = JSON.parse(localStorage.getItem('user'));
-      this.hasCelebrated = user.hadCelebrate;
-      localStorage.setItem('user', JSON.stringify(user));
 
+      this.isBirthday = today.getMonth() == bd.getMonth() && today.getDate() == bd.getDate();
+
+      var user: User = JSON.parse(localStorage.getItem('user'));
+
+      this.hasCelebrated = user.hadCelebrate;
+
+      localStorage.setItem('user', JSON.stringify(user));
     }
   }
 
@@ -110,7 +119,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       //renderer randomly all backgrounds
       this.setAllBackground();
 
-      gsap.registerPlugin(ScrollTrigger);
+      gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
       //initialize Locomotive-scroll with
       const scroll = new LocomotiveScroll({

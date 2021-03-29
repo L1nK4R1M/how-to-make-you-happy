@@ -1,32 +1,24 @@
-﻿<!-- <div class="p-4">
-    <div class="container">
-        <h2>Welcome {{user.firstName}}!</h2>
-        <br>
-        <p>In this site you can be happy ! How ? It's simple, you have to play and if by chance you win, the prize is yours ! But if you loose, you have a dare, and you have to do it before to play once again.
-            <br><br> Warning /!\/!\/!\ <br><br>
-            Every prize is different. An expensive prize is difficult and rare to win. More than that it's limited in time. For example, a prize in the expensive category can only be played once in three months or more. But a prize in the common category is less difficult but not too easy to win neither. It's also limited in time, but you can try more frequently, for example once every one or two weeks.
-        </p>
-    </div>
-</div> -->
-<div class="birthday-fireworks" *ngIf="(isBirthday && !hasCelebrated); else noBirthday">
+﻿<div class="birthday-fireworks" *ngIf="(isBirthday && !hasCelebrated); else noBirthday">
   <div class="hb-message" id="hbMessage-container" (click)="stopAnimation()">
       <div id="hbMessage">
         <h1>!! HAPPY BIRTHDAY {{currentUser.firstName.toUpperCase()}} !!</h1>
-        <h1>I love you so much ❤️❤️❤️</h1>
+        <h1 *ngIf="currentUser.firstname == Imaan">I love you so much ❤️❤️❤️</h1>
       </div>
   </div>
 </div>
 
 <ng-template #noBirthday>
-  <div #smoothscroll>
-    <section class="panel">
+  <div #smoothscroll data-scroll-container style="overflow-x: hidden;">
+    <section id="panel-top" ></section>
+    <section id="panel1" class="panel">
       <div #background1 class="background">
         <div class="welcome-container" *ngIf="currentUser">
           <h1>Welcome, {{currentUser.firstName}}</h1>
         </div>
-        <div class="img-text-container-right gs_reveal gs_reveal_fromRight" style="flex-grow: 2;">
+        <div class="img-text-container-right gs_reveal gs_reveal_fromRight">
           <div class="text-right-container">
-            <p style="padding: 10px;">Welcome! How to make you happy? With your partner(or friends), you can play this little game. You must to be at least 2. 
+            <p style="padding: 10px;">Welcome to How to make you happy? <br>Would you like that you partner offer you what you have always wanted? 
+              <br>With your partner(or friends), you can play this little game.  
               You can win anything that you want but it depends on your chance. It's like bet on something that you have always wanted.
             </p>
           </div>
@@ -34,56 +26,62 @@
             <img src={{randomBagsPic}}>
           </div>
         </div>
-        <i class="scroll-down fas fa-chevron-down bounce"></i>
+        <div class="scroll-down" href='#panel2' data-scroll-to><i class="fas fa-chevron-down bounce-down"></i></div>
       </div>
     </section>
 
-    <section class="panel">
+    <section id="panel2" class="panel">
       <div #background2 class="background">
         <div class="img-text-container-left gs_reveal gs_reveal_fromLeft">
           <div class="img-left-container">
             <img src={{randomShoesPic}}>
           </div>
           <div class="text-left-container">
-            <p style="padding: 10px;">Here's the rules : Your partner accepts to offer you any gift that you like, for example : beautiful shoes. Than you add this prize to the list of prizes with
-              all the details needed (Picture is not mandatory). And voilà ! Pray, play and the prize might be yours.
+            <p style="padding: 10px;">Here's the rules, it's simple : You win, your partner buy it for you.<br> 
+              For that you need to add what you would like to have as a prize in the list. Complete the form with 
+              all the details needed. And voilà ! Pray, play and the prize might be yours.
             </p>
           </div>
         </div>
+        <div class="scroll-down" href='#panel3' data-scroll-to><i class="fas fa-chevron-down bounce-down"></i></div>
       </div>
     </section>
 
-    <section class="panel">
+    <section id="panel3" class="panel">
       <div #background3 class="background">
         <div class="img-text-container-right gs_reveal gs_reveal_fromRight">
           <div class="text-right-container">
-            <p style="padding: 10px;">As said earlier, you can add anything that you want that your partner can afford to offer you. Jewelry, bags or travel for two.
-              All gifts are not the same. Some are expensive others are cheaper. For every category of prizes, there is a countdown for it. 
-              More expensive it is more you have to wait before to play. It means that you can play only once for the prize until the next countdown.
-              If you loose, the countdown restarts and if you win, the prize is yours. You cannot put the same prize in the list, it has to be unique.
+            <p style="padding: 10px;">As said earlier, you can add anything that you want that your partner can afford to offer you. Jewelry, bags, 
+              restaurant or even travel for two.
+              <br>There is a countdown before to play. When you played and have lost, you can try again 24h later. 
+              <br>It is possible that multiple prizes can be available at the same time but you can win only one prize.
+              <br>But if you win all the prizes that you played with, they will have a new countdown depending on the cost of the winning prize.
+              <br>All prizes are not the same. Some are expensive others are cheaper. More expensive it is more you have to wait before to play. 
+              It also means that you can play only once per countdown. 
             </p>
           </div>
           <div class="img-right-container">
             <img src={{randomJewelryPic}}>
           </div>
         </div>
+        <div class="scroll-down" href='#panel4' data-scroll-to><i class="fas fa-chevron-down bounce-down"></i></div>
       </div>
     </section>
 
-    <section class="panel">
+    <section id="panel4" class="panel">
       <div #background4 class="background">
         <div class="img-text-container-left gs_reveal gs_reveal_fromLeft">
           <div class="img-left-container">
             <img src={{randomDressPic}}>
           </div>
           <div class="text-left-container">
-            <p style="padding: 10px;">When the countdown is over. you have 24h to play and maybe win the prize before the restart. It is possible that multiple prizes can be available at the same time.
-              But you can win only one prize.
-              So what are you waiting for ? Maybe the next prize is already yours. You just need to create an account.
-              Good Luck !
+            <p style="padding: 10px;">So what are you waiting for ? Maybe the next prize is already yours. 
+              <br>You just need to create an account.
+              <br>Good Luck and love your partner!
             </p>
           </div>
         </div>
+        <div  class="scroll-down" href='#panel-top' data-scroll-to><i class="fas fa-chevron-up bounce-up"></i></div>
       </div>
     </section>
 

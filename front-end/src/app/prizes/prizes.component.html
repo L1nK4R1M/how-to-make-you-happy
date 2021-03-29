@@ -1,6 +1,6 @@
 ﻿<div class="prizes-component">
   <p *ngIf="currentUser" style="margin-top: 77px;">LIST OF PRIZES</p>
-  <div class="list-prize">
+  <div class="list-prize table-responsive">
     <div>
       <button (click)="needToAdd = !needToAdd" *ngIf="currentUser" style="margin-bottom: 20px; height: 40px; display: block;"
         class="btn btn-sm btn-danger btn-add-prize mx-auto">
@@ -24,11 +24,11 @@
       </thead>
       <tbody>
         <tr *ngFor="let prize of prizes">
-          <td><img src="{{prize.picture}}" class="img-fluid img-thumbnail"></td>
+          <td><img src="{{prize.picture ? (pathToPicture+prize.picture) : ''}}" class="img-fluid img-thumbnail"></td>
           <td>{{prize.name}}</td>
           <td>{{prize.cost}}</td>
           <td>
-            <div class="timer-cell">{{prize.timer | async }}</div>
+            <div class="timer-cell" [ngStyle]="{'color' : prize.color}">{{prize.timer | async }}</div>
           </td>
           <td style="white-space: nowrap" *ngIf="currentUser.username == 'admin'">
             <a class="btn btn-sm btn-primary mr-1" (click)="editPrize(prize)">Edit</a>
@@ -61,7 +61,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let prize of prizesWon">
-          <td><img src="{{prize.picture}}" class="img-fluid img-thumbnail"></td>
+          <td><img src="{{prize.picture ? (pathToPicture+prize.picture) : ''}}" class="img-fluid img-thumbnail"></td>
           <td>{{prize.name}}</td>
           <td>{{prize.cost}}</td>
           <td>{{prize.won_date | date:'d/MM/yyyy HH:mm:ss'}}</td>
@@ -76,134 +76,102 @@
   </div>
 
   <div class="add-prize" *ngIf="needToAdd">
-    <div class="card">
-      <h4 class="card-header">Add a prize</h4>
-      <div class="card-body">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" formControlName="name" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f.name.errors }" />
-            <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
-              <div *ngIf="f.name.errors.required">Name is required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="cost">Cost</label>
-            <input type="text" formControlName="cost" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f.cost.errors }" />
-            <div *ngIf="submitted && f.cost.errors" class="invalid-feedback">
-              <div *ngIf="f.cost.errors.required">Cost is required</div>
-              <div *ngIf="f.cost.errors.pattern">Number is only required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="input-group px-2 py-2 rounded-pill bg-white shadow-sm">
-              <input id="upload" type="file" formControlName="picture" accept="image/*" (change)="updateName($event)"
-                class="form-control border-0" style="z-index: 10; position: absolute; width: 100%;">
-              <div class="input-group-append">
-                <label for="picture" class="btn btn-light m-0 rounded-pill px-4">
-                  <i class="fas fa-upload mr-2 text-muted"></i>
-                  <small class="text-uppercase font-weight-bold text-muted">Upload</small>
-                </label>
-              </div>
-              <label id="upload-label" for="picture"
-                class="font-weight-light text-muted text-right">{{pictureName}}</label>
-            </div>
-          </div>
-          <div class="form-group">
-            <button [disabled]="loading" class="btn btn-primary" style="margin-right: 20px">
-              <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span><span>Add</span>
+    <mat-card>
+      <mat-card-title><h4>Add prize</h4></mat-card-title>
+
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+
+          <mat-form-field >
+            <input matInput placeholder="Name" formControlName="name" required>
+            <mat-error *ngIf="f.name.invalid">Name is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field >
+            <input matInput type="number" placeholder="Cost" formControlName="cost" class="number-input" required>
+            <span matSuffix>€</span>
+            <mat-error *ngIf="f.cost.invalid">Cost is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <ngx-mat-file-input formControlName="picture" placeholder="Picture is not mandatory" accept="image/*" (change)="updateName($event)"></ngx-mat-file-input>
+            <mat-icon matSuffix>upload_file</mat-icon>
+          </mat-form-field>
+
+          <div class="button-group">
+            <button mat-raised-button color="primary" 
+            type="submit" 
+            [disabled]="loading || form.invalid" 
+            class="btn btn-primary">
+              <mat-spinner *ngIf="loading"></mat-spinner>
+              <span>Add</span>
             </button>
             <button (click)="needToAdd = !needToAdd" class="btn btn-secondary">
-              <span class="mr-1">Cancel</span>
+              <span>Cancel</span>
             </button>
           </div>
+
         </form>
-      </div>
-    </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
   <div class="edit-prize" *ngIf="needToEdit">
-    <div class="card">
-      <h4 class="card-header">Edit a prize</h4>
-      <div class="card-body">
-        <form [formGroup]="formEdit" (ngSubmit)="onSubmit()">
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" formControlName="name" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f2.name.errors }" />
-            <div *ngIf="submitted && f2.name.errors" class="invalid-feedback">
-              <div *ngIf="f2.name.errors.required">Name is required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="cost">Cost</label>
-            <input type="text" formControlName="cost" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f2.cost.errors }" />
-            <div *ngIf="submitted && f2.cost.errors" class="invalid-feedback">
-              <div *ngIf="f2.cost.errors.required">Cost is required</div>
-              <div *ngIf="f2.cost.errors.pattern">Number is only required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="category">Category</label>
-            <input type="text" formControlName="category" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f2.category.errors }" />
-            <div *ngIf="submitted && f2.category.errors" class="invalid-feedback">
-              <div *ngIf="f2.category.errors.required">Category is required</div>
-              <div *ngIf="f2.category.errors.pattern">Number is only required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="countdown_time">Countdown</label>
-            <input type="text" formControlName="countdown_time" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f2.countdown_time.errors }" />
-            <div *ngIf="submitted && f2.countdown_time.errors" class="invalid-feedback">
-              <div *ngIf="f2.countdown_time.errors.required">Countdown is required</div>
-              <div *ngIf="f2.countdown_time.errors.pattern">Number is only required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="already_won">Already won</label>
-            <input type="checkbox" formControlName="already_won" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f2.already_won.errors }" style="display: inline-block; position: absolute; left: 0px;"/>
-            <div *ngIf="submitted && f2.already_won.errors" class="invalid-feedback">
-              <div *ngIf="f2.already_won.errors.required">Already won is required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="user">User</label>
-            <input type="text" formControlName="user" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted && f2.user.errors }" />
-            <div *ngIf="submitted && f2.user.errors" class="invalid-feedback">
-              <div *ngIf="f2.user.errors.required">User is required</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="input-group px-2 py-2 rounded-pill bg-white shadow-sm">
-              <input id="upload" type="file" formControlName="picture" accept="image/*" (change)="updateName($event)"
-                class="form-control border-0" style="z-index: 10; position: absolute; width: 100%;">
-              <div class="input-group-append">
-                <label for="picture" class="btn btn-light m-0 rounded-pill px-4">
-                  <i class="fas fa-upload mr-2 text-muted"></i>
-                  <small class="text-uppercase font-weight-bold text-muted">Upload</small>
-                </label>
-              </div>
-              <label id="upload-label" for="picture"
-                class="font-weight-light text-muted text-right">{{pictureName}}</label>
-            </div>
-          </div>
-          <div class="form-group">
-            <button [disabled]="loading" class="btn btn-primary" style="margin-right: 20px">
-              <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span><span>Edit</span>
+    <mat-card>
+      <mat-card-title><h4>Edit a prize</h4></mat-card-title>
+
+      <mat-card-content>
+        <form [formGroup]="formEdit" (ngSubmit)="onSubmit()" class="form-container">
+
+          <mat-form-field >
+            <input matInput placeholder="Name" formControlName="name" required>
+            <mat-error *ngIf="f2.name.invalid">Name is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field >
+            <input matInput type="number" placeholder="Cost" formControlName="cost" class="number-input" required>
+            <span matSuffix>€</span>
+            <mat-error *ngIf="f2.cost.invalid">Cost is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field >
+            <input matInput type="number" placeholder="Category" formControlName="category" class="number-input" required>
+            <mat-error *ngIf="f2.category.invalid">Category is a number</mat-error>
+          </mat-form-field>
+
+          <mat-form-field >
+            <input matInput type="number" placeholder="Countdown" formControlName="countdown_time" class="number-input" required>
+            <span matSuffix>ms</span>
+            <mat-error *ngIf="f2.countdown_time.invalid">Countdown is required</mat-error>
+          </mat-form-field>
+
+          <mat-checkbox matInput type="checkbox" formControlName="already_won">Already won</mat-checkbox>
+          
+          <mat-form-field >
+            <input matInput placeholder="User" formControlName="user"  required>
+            <mat-error *ngIf="f2.user.invalid">User is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <ngx-mat-file-input formControlName="picture" placeholder="Picture is not mandatory" accept="image/*" (change)="updateName($event)"></ngx-mat-file-input>
+            <mat-icon matSuffix>upload_file</mat-icon>
+          </mat-form-field>
+
+          <div class="button-group">
+            <button mat-raised-button color="primary" 
+            type="submit" 
+            [disabled]="loading || formEdit.invalid" 
+            class="btn btn-primary">
+              <mat-spinner *ngIf="loading"></mat-spinner>
+              <span>Edit</span>
             </button>
             <button (click)="needToEdit = !needToEdit" class="btn btn-secondary">
-              <span class="mr-1">Cancel</span>
+              <span>Cancel</span>
             </button>
           </div>
+
         </form>
-      </div>
-    </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>

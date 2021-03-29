@@ -122,28 +122,28 @@ h1 {
   flex-grow: 2;
 }
 
-.timer-cell {
-  font-family: ABChanel Corpo SemiBold;
-  /*text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;*/
-  color: gold;
-  min-height: 30%;
+.wheel-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-grow: 1;
+  margin: 50px;
 }
 
 #wheelOfFortune {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   position: relative;
   overflow: hidden;
 }
 
 #wheel {
   display: block;
+  width: 100%;
+  height: auto;
 }
 
 #spin {
-  font: 1.5em/0 sans-serif;
+  font: 1.5em/0 ABChanel Corpo SemiBold;
   user-select: none;
   cursor: pointer;
   display: flex;
@@ -176,6 +176,10 @@ h1 {
 @media (max-width: 767px) {
   h1 {
     font-size: 1.5rem;
+  }
+
+  #spin {
+    font-size: 1.1em;
   }
 
 }

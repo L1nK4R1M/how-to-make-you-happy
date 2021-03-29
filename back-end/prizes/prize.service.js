@@ -50,8 +50,8 @@ async function create(params) {
 async function update(name, user, params) {
     const prize = await getPrize(name, user);
     // validate
-    const prizeNameChanged = params.name && prize.name !== params.name;
-    if (prizeNameChanged && await getPrize(name, user)) {
+    if (!prize) throw 'Prize not found';
+    if ((prize.name !== params.name || prize.user !== params.user) && await getPrize(params.name, params.user)) {
         throw 'Name "' + params.name + '" is already taken';
     }
 
