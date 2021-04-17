@@ -16,10 +16,11 @@ export class Utils {
 
     public static addCategory(prize: number): number {
         if (prize <= 30) return 1;
-        else if (30 < prize && prize < 100) return 2;
-        else if (100 <= prize && prize < 500) return 3;
-        else if (500 <= prize && prize < 1000) return 4;
-        else return 5;
+        else if (30 < prize && prize <= 100) return 2;
+        else if (100 < prize && prize <= 250) return 3;
+        else if (250 < prize && prize <= 500) return 4;
+        else if (500 < prize && prize < 1000) return 5;
+        else return 6;
     }
 
     public static addCountDown(cat: number): number {
@@ -28,7 +29,8 @@ export class Utils {
             case 2 : return GlobalConstants.TWO_WEEKS;break;
             case 3 : return GlobalConstants.THREE_MONTHS;break;
             case 4 : return GlobalConstants.SIX_MONTHS;break;
-            case 5 : return GlobalConstants.ONE_YEAR;break;
+            case 5 : 
+            case 6 : return GlobalConstants.ONE_YEAR;break;
         }
     }
       
@@ -52,5 +54,59 @@ export class Utils {
         const blue  = Math.sin(frequency*iteration+4+phase) * width + center;
         
         return RGB2Color(red,green,blue);
+    }
+
+    public static getScoreToDo(prize) {
+        if (prize.cost <= 10) {
+            return {name: prize.name, score: 300 + prize.cost* 20}  
+          }
+          else if (prize.cost > 10 && prize.cost <= 50) {
+            return {name: prize.name, score: 500 + prize.cost * 10}
+          }
+          else if (prize.cost > 50 && prize.cost <= 100) {
+            return {name: prize.name, score: 700 + prize.cost * 10}
+          }
+          else if (prize.cost > 100 && prize.cost <= 200) {
+            return {name: prize.name, score: 1000 + prize.cost}
+          }
+          else if (prize.cost > 200 && prize.cost <= 500) {
+            return {name: prize.name, score: 2000 + prize.cost}
+          }
+          else if (prize.cost > 500) {
+            return {name: prize.name, score: 3000 + prize.cost}
+          }
+    }
+
+    public static generateSectors(array, highestPrize) {
+      if (highestPrize.category == 1 || highestPrize.category == 2) {
+        return array.concat(
+          Array.apply(null, Array(array.length * 2)
+          .map((a, i )=> ({'label': "Loose"})
+        )))
+      }
+      else if (highestPrize.category == 3) {
+        return array.concat(
+          Array.apply(null, Array(array.length * (array.length + 3))
+          .map((a, i )=> ({'label': "Loose"})
+        )))
+      }
+      else if (highestPrize.category == 4) {
+        return array.concat(
+          Array.apply(null, Array(array.length * (array.length + 4))
+          .map((a, i )=> ({'label': "Loose"})
+        )))
+      }
+      else if (highestPrize.category >= 5) {
+        return array.concat(
+          Array.apply(null, Array(array.length * (array.length + 6))
+          .map((a, i )=> ({'label': "Loose"})
+        )))
+      }
+    }
+
+    public static duplicateElements(array, times) {
+      return array.reduce((res, current) => {
+          return res.concat(Array(times).fill(current));
+      }, []);
     }
 }

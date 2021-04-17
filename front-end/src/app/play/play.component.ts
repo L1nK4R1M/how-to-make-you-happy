@@ -10,6 +10,9 @@ import { first,  map} from 'rxjs/operators';
 import { Fireworks} from 'fireworks-js';
 import * as bootstrap from "bootstrap";
 
+import {Runner} from '../game/Runner';
+
+
 
 @Component({
   selector: 'play-page',
@@ -27,6 +30,11 @@ export class PlayComponent implements OnInit {
   displayWon = false;
   fireworks: any;
   sectors: any;
+  luck = false;
+  game = false;
+  luckOrGame = false;
+  minScore: number = 0;
+  nbTries = 3;
 
   constructor(private accountService: AccountService, private prizeService: PrizeService, private router: Router, private route: ActivatedRoute, private alertService: AlertService) {}
 
@@ -52,23 +60,50 @@ export class PlayComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    
+  }
+
+  getScoreGame(playerScore: number) {
+    var scoreArray = this.prizes.map(p => Utils.getScoreToDo(p))
+
+    var resultScore = scoreArray.filter(score => score.score < playerScore)
+
+    if (resultScore.length > 0) {
+      var highestPrize = resultScore.reduce(function(prev, current) {
+        return (prev.score > current.score) ? prev : current
+    })
+      this.announceResult(highestPrize.name);
+    } else {
+      this.announceResult("Loose");
+    }
+  }
+
+  chooseLuckOrGame(type:string) {
+    this.luckOrGame = !this.luckOrGame;
+    this.nbTries = this.nbTries - 1;
+
+    if (type == "luck") {
+      this.luck = !this.luck;
+      timer(200).subscribe(() => this.wheelOfFortune(this.sectors));
+    }
+
+     if (type == "game") {
+      var scoreArray = this.prizes.map(p => Utils.getScoreToDo(p))
+      this.minScore = Math.min.apply(Math, scoreArray.map(function(p) { return p.score; }))
+      this.game = !this.game;
+      timer(200).subscribe(() => new Runner(".interstitial-wrapper", undefined , this));
+     }
   }
 
   initializeWheelFortune () {
-    this.sectors = this.prizes.map((p, i) => ({'label': p.name}))
-    .concat(
-      Array.apply(null, Array(this.prizes.length*7))
-      .map((a, i )=> ({'label': "Loose"})
-      ))
-    .concat(
-      Array.apply(null, Array(Math.ceil(this.prizes.length/2)))
-      .map((a, i ) => ({'label': "Dare"})
-      ))
-      
-    this.sectors = multipleShuffle(this.sectors, 5).map((sector, i: number) => ({'label': sector.label, 'color': Utils.getColor(i, this.sectors.length)}));
+    var highestPrize = this.prizes.reduce(function(prev, current) {
+      return (prev.cost > current.cost) ? prev : current
+    })
 
-    timer(200).subscribe(() => this.wheelOfFortune(this.sectors));
+    this.sectors = Utils.duplicateElements(this.prizes.map((p, i) => ({'label': p.name})), (highestPrize.category >= 3 ? 1 : highestPrize.category))
+
+    this.sectors = Utils.generateSectors(this.sectors, highestPrize)
+
+    this.sectors = multipleShuffle(this.sectors, 3).map((sector, i: number) => ({'label': sector.label, 'color': Utils.getColor(i, this.sectors.length)}));
 
     function multipleShuffle(a, number) {
       var array = a;
@@ -101,13 +136,20 @@ export class PlayComponent implements OnInit {
         $(".congrats-fireworks").addClass("active");
         this.startAnimation();
       });
+      this.updatePrize(prize);
+    } else if (this.nbTries > 0) {
+      this.luckOrGame = !this.luckOrGame;
+      if(this.luck) this.luck = !this.luck;
+      if(this.game) this.game = !this.game;
+      $('#modalLoose').modal('show');
     } else {
       $('#modalLoose').modal('show');
       $('#modalLoose').on('hidden.bs.modal', function (e) {
         window.location.reload();
       })
+      this.updatePrize(prize);
     }
-    this.updatePrize(prize);
+    
   }
 
   findExpensivePrize() {
@@ -172,6 +214,9 @@ export class PlayComponent implements OnInit {
             this.prizes.forEach(p => {
                 this.prizes.forEach(p => this.resetCountdownPrize(p, prize.countdown_time));
             });
+            this.luckOrGame = false;
+            this.luck = false;
+            this.game = false;
           },
           error: error => {
             this.alertService.error(error);
@@ -338,7 +383,7 @@ export class PlayComponent implements OnInit {
       engine(); // Start engine
       EL_spin.textContent = "SPIN";
       EL_spin.addEventListener("click", () => {
-      if (!angVel) angVel = rand(0.5, 3.75);
+      if (!angVel) angVel = rand(0.24, 0.95);
     });
   }
 

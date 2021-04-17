@@ -36,6 +36,9 @@ async function create(params) {
     if (await db.User.findOne({ where: { username: params.username } })) {
         throw 'Username "' + params.username + '" is already taken';
     }
+    if (await db.User.findOne({ where: { email: params.email } })) {
+        throw 'Email "' + params.email + '" is already taken';
+    }
 
     // hash password
     if (params.password) {
@@ -48,11 +51,14 @@ async function create(params) {
 
 async function update(id, params) {
     const user = await getUser(id);
-
+ 
     // validate
     const usernameChanged = params.username && user.username !== params.username;
     if (usernameChanged && await db.User.findOne({ where: { username: params.username } })) {
         throw 'Username "' + params.username + '" is already taken';
+    }
+    if (usernameChanged && await db.User.findOne({ where: { email: params.email } })) {
+        throw 'Email "' + params.email + '" is already taken';
     }
 
     // hash password if it was entered
