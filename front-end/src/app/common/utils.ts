@@ -77,36 +77,23 @@ export class Utils {
           }
     }
 
-    public static generateSectors(array, highestPrize) {
-      if (highestPrize.category == 1 || highestPrize.category == 2) {
-        return array.concat(
-          Array.apply(null, Array(array.length * 2)
-          .map((a, i )=> ({'label': "Loose"})
-        )))
-      }
-      else if (highestPrize.category == 3) {
-        return array.concat(
-          Array.apply(null, Array(array.length * (array.length + 3))
-          .map((a, i )=> ({'label': "Loose"})
-        )))
-      }
-      else if (highestPrize.category == 4) {
-        return array.concat(
-          Array.apply(null, Array(array.length * (array.length + 4))
-          .map((a, i )=> ({'label': "Loose"})
-        )))
-      }
-      else if (highestPrize.category >= 5) {
-        return array.concat(
-          Array.apply(null, Array(array.length * (array.length + 6))
-          .map((a, i )=> ({'label': "Loose"})
-        )))
-      }
-    }
+    public static generateSectors(prize, multiplier) {
+       var arrayPrize = Array(multiplier).fill({'label': prize.name})
 
-    public static duplicateElements(array, times) {
-      return array.reduce((res, current) => {
-          return res.concat(Array(times).fill(current));
-      }, []);
+      if (prize.category == 1 ) {
+        return arrayPrize.concat(Array(arrayPrize.length * 2).fill({'label': "Loose"}))
+      }
+      if (prize.category == 2) {
+        return arrayPrize.concat(Array(arrayPrize.length * (arrayPrize.length + 2)).fill({'label': "Loose"}))
+      }
+      else if (prize.category == 3) {
+        return arrayPrize.concat(Array(arrayPrize.length * (arrayPrize.length + 3)).fill({'label': "Loose"}))
+      }
+      else if (prize.category == 4) {
+        return arrayPrize.concat(Array(arrayPrize.length * (arrayPrize.length + 4)).fill({'label': "Loose"}))
+      }
+      else if (prize.category >= 5) {
+        return arrayPrize.concat(Array(arrayPrize.length * (arrayPrize.length + 6)).fill({'label': "Loose"}))
+      }
     }
 }

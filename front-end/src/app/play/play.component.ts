@@ -22,11 +22,11 @@ import {Runner} from '../game/Runner';
 export class PlayComponent implements OnInit {
   currentUser: User;
   prizes: Prize[] = [];
+  userPrizes: Prize[] = [];
   sortAsc: boolean = false;
   isPlaying = false;
   isLoading = false;
   resultRandom = null;
-  hasWon = false;
   displayWon = false;
   fireworks: any;
   sectors: any;
@@ -34,7 +34,7 @@ export class PlayComponent implements OnInit {
   game = false;
   luckOrGame = false;
   minScore: number = 0;
-  nbTries = 3;
+  nbTries = 2;
 
   constructor(private accountService: AccountService, private prizeService: PrizeService, private router: Router, private route: ActivatedRoute, private alertService: AlertService) {}
 
@@ -53,6 +53,11 @@ export class PlayComponent implements OnInit {
           if (this.prizes.length > 0) {
             this.initializeWheelFortune();
           }
+        });
+        this.prizeService.getByUser(this.currentUser.username)
+        .pipe(first())
+        .subscribe(prizes => {
+          this.userPrizes = prizes.filter(p => p.already_won == false);
         });
     }
 
@@ -99,9 +104,16 @@ export class PlayComponent implements OnInit {
       return (prev.cost > current.cost) ? prev : current
     })
 
-    this.sectors = Utils.duplicateElements(this.prizes.map((p, i) => ({'label': p.name})), (highestPrize.category >= 3 ? 1 : highestPrize.category))
+    this.sectors = this.prizes.map((p, i) => {
+      if (p.category == 1 )
+      return Utils.generateSectors(p, 3)
+      if (p.category == 2 )
+      return Utils.generateSectors(p, 2)
+      if (p.category >= 3 )
+      return Utils.generateSectors(p, 1)
+    })
 
-    this.sectors = Utils.generateSectors(this.sectors, highestPrize)
+    this.sectors =  this.sectors.flat(1)
 
     this.sectors = multipleShuffle(this.sectors, 3).map((sector, i: number) => ({'label': sector.label, 'color': Utils.getColor(i, this.sectors.length)}));
 
@@ -127,16 +139,13 @@ export class PlayComponent implements OnInit {
     var prize = this.prizes.find(p => p.name == result)
     this.resultRandom = result;
     if (prize) {
-      this.hasWon = true;
       prize.already_won = true;
-    }
-    if (this.hasWon) {
       this.displayWon = true;
       timer(100).subscribe(() => {
         $(".congrats-fireworks").addClass("active");
         this.startAnimation();
       });
-      this.updatePrize(prize);
+      this.updatePrize(prize, true);
     } else if (this.nbTries > 0) {
       this.luckOrGame = !this.luckOrGame;
       if(this.luck) this.luck = !this.luck;
@@ -150,12 +159,6 @@ export class PlayComponent implements OnInit {
       this.updatePrize(prize);
     }
     
-  }
-
-  findExpensivePrize() {
-    return this.prizes.reduce(function(prev, current) {
-      return (prev.category > current.category) ? prev : current
-    })
   }
 
   startAnimation() {
@@ -203,17 +206,14 @@ export class PlayComponent implements OnInit {
     window.location.reload();
   }
 
-  updatePrize(prize: Prize) {
-    if (this.hasWon) {
+  updatePrize(prize: Prize, win: boolean = false) {
+    if (win) {
       prize.won_date = new Date(Date.now());
       this.prizeService.update(prize.name, prize.user, prize)
         .pipe(first())
         .subscribe({
           next: () => {
             this.alertService.success('Prize updated successfully', { keepAfterRouteChange: true });
-            this.prizes.forEach(p => {
-                this.prizes.forEach(p => this.resetCountdownPrize(p, prize.countdown_time));
-            });
             this.luckOrGame = false;
             this.luck = false;
             this.game = false;
@@ -222,7 +222,9 @@ export class PlayComponent implements OnInit {
             this.alertService.error(error);
           }
         });
-
+        this.prizes.forEach(p => { 
+          if (p.name != prize.name) this.resetCountdownPrize(p, prize.countdown_time)
+        });
     } else {
       if (!prize) {
         this.prizes.forEach((p, i) => this.resetCountdownPrize(p, ((24 * 60 * 60 * 1000) * (i+1))));

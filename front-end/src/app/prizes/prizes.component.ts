@@ -251,12 +251,12 @@ export class PrizesComponent {
         newPrize.picture = this.pictureName
 
         var today = Date.now();
-        var yesterday = today - (24 * 60 * 60 * 1000);
         var mostRecentPrizeWon = this.prizesWon.reduce(function(prev, current) {
-            return (new Date(prev.time_end).getTime() > new Date(current.time_end).getTime()) ? prev : current
+            return (new Date(prev.won_date).getTime() > new Date(current.won_date).getTime()) ? prev : current
         })
-        if (yesterday < mostRecentPrizeWon.time_end.getTime() && mostRecentPrizeWon.time_end.getTime() < today) {
-            newPrize.time_end = new Date(today + mostRecentPrizeWon.timer);
+        var pastTimeBeforePlay = today - mostRecentPrizeWon.countdown_time
+        if (pastTimeBeforePlay < new Date(mostRecentPrizeWon.won_date).getTime() && new Date(mostRecentPrizeWon.won_date).getTime() < today) {
+            newPrize.time_end = new Date(today + (new Date(mostRecentPrizeWon.won_date).getTime() - pastTimeBeforePlay) + ((24 * 60 * 60 * 1000) * this.prizes.length));
         } else {
             newPrize.time_end = new Date(today + ((24 * 60 * 60 * 1000) * this.prizes.length));
         }
